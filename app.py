@@ -1,26 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_bcrypt import Bcrypt
+from wtforms.fields.simple import SubmitField
+
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired, Length, EqualTo
-import os
+
 
 app = Flask(__name__)
-app.config.from_object(Config)  # Load configuration from config.py
+app.config.from_object(Config)
 
-# Initialize extensions
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# Define User model
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
 
-# Forms for registration and login
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6, max=100)])
@@ -29,15 +29,16 @@ class RegisterForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=50)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6, max=100)])
+    submit = SubmitField('Login')
 
 with app.app_context():
-    db.create_all()  # This will create the tables if they do not exist
+    db.create_all()
     print("baza danych śmiga")
 
-# Routes for login, register, dashboard, and logout
 @app.route('/')
 def home():
-    return render_template('login.html')
+    form = LoginForm()
+    return render_template('login.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -93,7 +94,7 @@ def dashboard():
 def logout():
     session.pop('user_id', None)
     flash('You have been logged out!', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)

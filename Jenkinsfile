@@ -2,33 +2,40 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'flask_app'
-        DOCKER_TAG = 'latest'
-        IMAGE_NAME = "flask-app"
+        DOCKER_IMAGE_NAME = "flask_app"
+        DOCKER_TAG = "latest"
+        DOCKERFILE_PATH = "."
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Install Dependencies') {
             steps {
-                git 'https://github.com/PiotrGrabias/open-src'
+                script {
+                    bat 'pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    bat 'pytest --maxfail=1 --disable-warnings -q'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}:${DOCKER_TAG}")
+                    bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} ${DOCKERFILE_PATH}"
                 }
             }
         }
 
-        stage('Deploy Locally') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    bat '''
-                        docker-compose down  # Stop and remove containers
-                        docker-compose up -d  # Rebuild and restart containers in detached mode
-                    '''
+                    bat "docker run -d -p 5000:5000 --name flask_app ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                 }
             }
         }
@@ -36,7 +43,16 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            bat 'docker rm -f flask_app || echo No running container to remove'
+            bat 'docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} || echo No image to remove'
+        }
+
+        success {
+            echo 'Build and Tests succeeded! The container is running.'
+        }
+
+        failure {
+            echo 'Build or Tests failed!'
         }
     }
 }

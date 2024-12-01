@@ -16,31 +16,61 @@
     </section>
 
     <div class="container">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="notification is-danger">
+                    {% for category, message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <form method="POST" action="{{ url_for('register') }}">
             {{ form.hidden_tag() }}
+
+            <!-- Username field -->
             <div class="field">
-                <label class="label">Nazwa użytkownika</label>
+                <label class="label" for="username">Nazwa użytkownika</label>
                 <div class="control">
-                    {{ form.username(class="input", placeholder="Wprowadź nazwę użytkownika") }}
+                    {{ form.username(id="username", class="input", placeholder="Wprowadź nazwę użytkownika") }}
                 </div>
+                {% if form.username.errors %}
+                    <p class="help is-danger">{{ form.username.errors[0] }}</p>
+                {% endif %}
             </div>
+
+            <!-- Password field -->
             <div class="field">
-                <label class="label">Hasło</label>
+                <label class="label" for="password">Hasło</label>
                 <div class="control">
-                    {{ form.password(class="input", placeholder="Wprowadź hasło", type="password") }}
+                    {{ form.password(id="password", class="input", placeholder="Wprowadź hasło", type="password") }}
                 </div>
+                {% if form.password.errors %}
+                    <p class="help is-danger">{{ form.password.errors[0] }}</p>
+                {% endif %}
             </div>
+
+            <!-- Confirm password field -->
             <div class="field">
-                <label class="label">Potwierdź hasło</label>
+                <label class="label" for="confirm_password">Potwierdź hasło</label>
                 <div class="control">
-                    {{ form.confirm_password(class="input", placeholder="Potwierdź hasło", type="password") }}
+                    {{ form.confirm_password(id="confirm_password", class="input", placeholder="Potwierdź hasło", type="password") }}
                 </div>
+                {% if form.confirm_password.errors %}
+                    <p class="help is-danger">{{ form.confirm_password.errors[0] }}</p>
+                {% endif %}
             </div>
+
+            <!-- Submit button -->
             <div class="field">
                 <div class="control">
                     <button type="submit" class="button is-primary">Zarejestruj się</button>
                 </div>
             </div>
+
+            <!-- Link to login page -->
             <p>Masz już konto? <a href="{{ url_for('login') }}">Zaloguj się tutaj</a></p>
         </form>
     </div>
