@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'flask-app-image'
+        DOCKER_IMAGE = 'flask_app'
         DOCKER_TAG = 'latest'
         IMAGE_NAME = "flask-app"
     }
@@ -25,7 +25,7 @@ pipeline {
         stage('Deploy Locally') {
             steps {
                 script {
-                    sh '''
+                    bat '''
                         docker-compose down  # Stop and remove containers
                         docker-compose up -d  # Rebuild and restart containers in detached mode
                     '''
