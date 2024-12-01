@@ -32,7 +32,7 @@ class LoginForm(FlaskForm):
 
 with app.app_context():
     db.create_all()  # This will create the tables if they do not exist
-    print("SQLite database and tables created successfully!")
+    print("baza danych śmiga")
 
 # Routes for login, register, dashboard, and logout
 @app.route('/')
