@@ -1,21 +1,15 @@
 import pytest
 from app import app, db, User
 
-
 @pytest.fixture(scope='module')
 def test_client():
-    # Configure the app for testing with a separate test database
-    app.config.from_object('config.TestConfig')
+    app.config.from_object('config.TestConfig')  # Ensure TestConfig is correctly loaded
     with app.test_client() as client:
-        # Establish an application context for the tests
         with app.app_context():
-            # Create the database tables
-            db.create_all()
-        yield client
-        # Clean up after tests by dropping tables
+            db.create_all()  # Set up the test database
+        yield client  # This is where the test client is used
         with app.app_context():
-            db.drop_all()
-
+            db.drop_all()  # Clean up the database after tests
 
 def test_register_user(test_client):
     response = test_client.post('/register', data={
@@ -27,7 +21,7 @@ def test_register_user(test_client):
     assert response.status_code == 200
 
     response_data = response.data.decode('utf-8')
-    assert 'Zaloguj się' in response_data
+    assert 'Zaloguj się' in response_data  # Check for login redirect message
 
     user = User.query.filter_by(username='testuser').first()
     assert user is not None
