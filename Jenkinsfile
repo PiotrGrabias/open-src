@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // Use any available agent
+    agent any
 
     environment {
         DOCKER_IMAGE = 'flask-app-image'
@@ -21,16 +21,6 @@ pipeline {
                 }
             }
         }
-
-//         stage('Run Tests') {
-//             steps {
-//                 script {
-//                     docker.image("${IMAGE_NAME}:${DOCKER_TAG}").inside {
-//                         sh 'pytest --maxfail=1 --disable-warnings -q'  // Running tests
-//                     }
-//                 }
-//             }
-//         }
 
         stage('Deploy Locally') {
             steps {
