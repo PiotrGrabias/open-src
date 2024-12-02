@@ -12,7 +12,6 @@ def test_client():
             db.drop_all()  # Clean up the database after tests
 
 def test_register_user(test_client):
-    # Simulate user registration
     response = test_client.post('/register', data={
         'username': 'testuser',
         'password': 'password123',
