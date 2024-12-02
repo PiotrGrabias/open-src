@@ -9,7 +9,7 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import InputRequired, Length, EqualTo
 
 
-app = Flask(__name__)
+app = Flask(__name__
 app.config.from_object(Config)
 
 db = SQLAlchemy(app)
