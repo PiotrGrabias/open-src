@@ -6,17 +6,6 @@ pipeline {
         DOCKER_TAG = "latest"
         DOCKERFILE_PATH = "."
     }
-
-    stages {
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    bat 'pip install -r requirements.txt'
-                }
-            }
-        }
-
-
         stage('Build Docker Image') {
             steps {
                 script {
