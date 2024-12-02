@@ -6,6 +6,8 @@ pipeline {
         DOCKER_TAG = "latest"
         DOCKERFILE_PATH = "."
     }
+
+    stages {
         stage('Build Docker Image') {
             steps {
                 script {
