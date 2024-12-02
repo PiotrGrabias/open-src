@@ -30,7 +30,6 @@ def test_register_user(test_client):
         print("User not found in the database after registration!")
         print("All users in the database:", User.query.all())
 
-    assert user is not None
     assert user.username == 'testuser'
 
     # Optionally, check for flash messages
