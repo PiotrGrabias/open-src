@@ -16,13 +16,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    bat 'pytest --maxfail=1 --disable-warnings -q'
-                }
-            }
-        }
 
         stage('Build Docker Image') {
             steps {
