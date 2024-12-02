@@ -8,6 +8,15 @@ pipeline {
     }
 
     stages {
+        stage('Stop Existing Container') {
+            steps {
+                script {
+                    bat """
+                    docker ps -q --filter "name=flask_app" | findstr . && docker stop flask_app && docker rm flask_app || echo "No running container to stop"
+                    """
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
