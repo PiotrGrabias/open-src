@@ -35,10 +35,6 @@ pipeline {
     }
 
     post {
-        always {
-            bat 'docker rm -f flask_app || echo No running container to remove'
-            bat 'docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} || echo No image to remove'
-        }
 
         success {
             echo 'Build and Tests succeeded! The container is running.'
