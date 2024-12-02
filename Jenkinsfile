@@ -9,7 +9,7 @@ pipeline {
 
     stages {
 
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
                     bat """
@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Deploy') {
             steps {
                 script {
                     bat "docker run -d -p 5000:5000 --name flask_app ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
