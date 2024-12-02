@@ -1,36 +1,51 @@
 import pytest
-from app import app, db, User
+from app import app, db, User  # Ensure these are imported correctly from your app
+from flask import session
 
-@pytest.fixture(scope='module')
-def test_client():
-    app.config.from_object('config.TestConfig')  # Ensure TestConfig is correctly loaded
+@pytest.fixture
+def client():
+    # Setup test client
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # Use in-memory DB for tests
+    app.config['SECRET_KEY'] = 'test_secret_key'
+
     with app.test_client() as client:
         with app.app_context():
-            db.create_all()  # Set up the test database
-        yield client  # This is where the test client is used
+            db.create_all()
+        yield client
         with app.app_context():
-            db.drop_all()  # Clean up the database after tests
+            db.drop_all()
 
-def test_register_user(test_client):
-    response = test_client.post('/register', data={
+def test_register_button(client):
+
+    data = {
         'username': 'testuser',
         'password': 'password123',
         'confirm_password': 'password123'
-    }, follow_redirects=True)
+    }
 
-    # Assert the response status code is 200 (success)
+    response = client.post('/register', data=data, follow_redirects=True)
+
     assert response.status_code == 200
+    assert "Zaloguj się tutaj" in response.data
 
-    # Check that the user was added to the database
-    user = User.query.filter_by(username='testuser').first()
+    with app.app_context():
+        user = User.query.filter_by(username='testuser').first()
+        assert user is not None
+        assert user.username == 'testuser'
 
-    # Print debug info if the user is not found
-    if user is None:
-        print("User not found in the database after registration!")
-        print("All users in the database:", User.query.all())
+def test_register_existing_user(client):
+    with app.app_context():
+        hashed_password = app.bcrypt.generate_password_hash('password123').decode('utf-8')
+        db.session.add(User(username='existinguser', password=hashed_password))
+        db.session.commit()
 
-    assert user.username == 'testuser'
+    data = {
+        'username': 'existinguser',
+        'password': 'password123',
+        'confirm_password': 'password123'
+    }
+    response = client.post('/register', data=data, follow_redirects=True)
 
-    # Optionally, check for flash messages
-    response_data = response.data.decode('utf-8')
-    assert 'Account created! You can now log in.' in response_data
+    assert response.status_code == 200
+    assert b"Username already exists" in response.data

@@ -78,8 +78,6 @@ def register():
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-
-            flash('Account created! You can now log in.', 'success')
             return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
@@ -93,7 +91,6 @@ def dashboard():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('You have been logged out!', 'info')
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
