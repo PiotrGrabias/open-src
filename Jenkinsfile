@@ -8,6 +8,16 @@ pipeline {
     }
 
     stages {
+        stage('Stop Existing Container') {
+            steps {
+                script {
+                    bat """
+                    docker ps -q --filter "name=flask_app" | findstr . && docker stop flask_app && docker rm flask_app || echo "No running container to stop"
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -26,19 +36,12 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                bat "docker rm -f flask_app || echo No running container to remove"
-                bat "docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} || echo No image to remove"
-            }
-        }
-
         success {
-            echo 'Build and Tests succeeded! The container is running.'
+            echo 'Build and deployment succeeded! The container is running with the latest image.'
         }
 
         failure {
-            echo 'Build or Tests failed!'
+            echo 'Build or deployment failed!'
         }
     }
 }
